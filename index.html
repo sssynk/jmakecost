@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>jMake</title>
+        <!-- Pico.css CDN -->
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
+        />
+    </head>
+    <body>
+        <main class="container">
+            <h1>jMake Cost Estimator</h1>
+            <form id="jMakeForm" novalidate>
+                <label for="material">Select Material:</label>
+                <select id="material" name="material" required>
+                    <option value="">-- Select Material --</option>
+                    <option value="wood">Wood</option>
+                    <option value="metal">Metal</option>
+                    <option value="plastic">Plastic</option>
+                    <option value="resin">Resin</option>
+                    <option value="wax">Wax</option>
+                    <option value="acrylic">Acrylic</option>
+                </select>
+
+                <!-- Wood Options -->
+                <div id="woodOptions" style="display: none">
+                    <label for="woodItemType">Type of Item:</label>
+                    <select id="woodItemType" name="woodItemType" required>
+                        <option value="">-- Select Item Type --</option>
+                        <option value="2d">2D (Sign or Engraving)</option>
+                        <option value="3d">3D (Figurine)</option>
+                    </select>
+
+                    <label for="woodMaterial">Type of Wood:</label>
+                    <select id="woodMaterial" name="woodMaterial" required>
+                        <option value="">-- Select Wood Type --</option>
+                        <option value="easiest">Easiest</option>
+                        <option value="cedar">Cedar</option>
+                        <option value="mahogany">Mahogany</option>
+                        <option value="walnut">Walnut</option>
+                        <option value="cherry">Cherry</option>
+                        <option value="oak">Oak</option>
+                        <option value="birch">Birch</option>
+                        <option value="pine">Pine</option>
+                        <option value="alder">Alder</option>
+                    </select>
+
+                    <label for="woodSize">Approximate Size (in inches):</label>
+                    <input
+                        type="number"
+                        id="woodSize"
+                        name="woodSize"
+                        required
+                        min="1"
+                    />
+                </div>
+
+                <!-- Metal Options -->
+                <div id="metalOptions" style="display: none">
+                    <label for="metalItemType">Type of Item:</label>
+                    <select id="metalItemType" name="metalItemType" required>
+                        <option value="">-- Select Item Type --</option>
+                        <option value="2d">2D (Sign or Engraving)</option>
+                        <option value="3d">3D (Figurine)</option>
+                    </select>
+
+                    <label for="metalMaterial">Type of Metal:</label>
+                    <select id="metalMaterial" name="metalMaterial" required>
+                        <option value="">-- Select Metal Type --</option>
+                        <option value="easiest">Easiest (6061 Aluminum)</option>
+                        <option value="6061 aluminum">6061 Aluminum</option>
+                        <option value="other aluminum alloy">
+                            Other Aluminum Alloy
+                        </option>
+                        <option value="steel">Steel</option>
+                        <option value="brass">Brass</option>
+                        <option value="gold">Gold</option>
+                        <option value="silver">Silver</option>
+                        <option value="titanium">
+                            Titanium (up to G5 hardness)
+                        </option>
+                    </select>
+
+                    <label for="metalSize">Approximate Size (in inches):</label>
+                    <input
+                        type="number"
+                        id="metalSize"
+                        name="metalSize"
+                        required
+                        min="1"
+                    />
+                </div>
+
+                <!-- Plastic Options -->
+                <div id="plasticOptions" style="display: none">
+                    <label for="plasticType">Type of Plastic:</label>
+                    <select id="plasticType" name="plasticType" required>
+                        <option value="">-- Select Plastic Type --</option>
+                        <option value="pla">General Use (PLA)</option>
+                        <option value="petg">High Hardness (PETG)</option>
+                        <option value="tpu">Flexible (TPU)</option>
+                        <option value="htpla">
+                            Temperature Resistant (HTPLA Annealed)
+                        </option>
+                    </select>
+
+                    <label for="plasticColor">Color:</label>
+                    <select id="plasticColor" name="plasticColor" required>
+                        <option value="">-- Select Color --</option>
+                    </select>
+                </div>
+
+                <!-- Resin Options -->
+                <div id="resinOptions" style="display: none">
+                    <label for="resinColor">Color:</label>
+                    <select id="resinColor" name="resinColor" required>
+                        <option value="">-- Select Color --</option>
+                        <option value="black">Black</option>
+                        <option value="white">White</option>
+                    </select>
+                </div>
+
+                <!-- Wax Options -->
+                <div id="waxOptions" style="display: none">
+                    <label for="waxItemType">Type of Item:</label>
+                    <select id="waxItemType" name="waxItemType" required>
+                        <option value="">-- Select Item Type --</option>
+                        <option value="2d">2D (Sign or Engraving)</option>
+                        <option value="3d">3D (Figurine)</option>
+                    </select>
+                </div>
+
+                <!-- Acrylic Options -->
+                <div id="acrylicOptions" style="display: none">
+                    <label for="acrylicItemType">Type of Item:</label>
+                    <select
+                        id="acrylicItemType"
+                        name="acrylicItemType"
+                        required
+                    >
+                        <option value="">-- Select Item Type --</option>
+                        <option value="2d">2D (Sign or Engraving)</option>
+                        <option value="3d">3D (Figurine)</option>
+                    </select>
+                </div>
+
+                <button type="submit">Get Estimate</button>
+                <button type="reset">Reset</button>
+            </form>
+
+            <section id="estimateSection" style="display: none">
+                <h2>Estimated Cost</h2>
+                <h4 id="estimate"></h4>
+                <p id="moreInfo"></p>
+
+                <p>
+                    Interested in a more detailed estimate? Send James a
+                    screenshot of your choices and let him know more about what
+                    you want!
+                </p>
+            </section>
+        </main>
+
+        <script>
+            // JavaScript to handle dynamic form fields and cost estimation
+            // reset form on page load
+
+            const materialSelect = document.getElementById("material");
+            const optionsDivs = {
+                wood: document.getElementById("woodOptions"),
+                metal: document.getElementById("metalOptions"),
+                plastic: document.getElementById("plasticOptions"),
+                resin: document.getElementById("resinOptions"),
+                wax: document.getElementById("waxOptions"),
+                acrylic: document.getElementById("acrylicOptions"),
+            };
+
+            const plasticTypeSelect = document.getElementById("plasticType");
+            const plasticColorSelect = document.getElementById("plasticColor");
+
+            materialSelect.addEventListener("change", function () {
+                // Hide all option sections
+                Object.values(optionsDivs).forEach(
+                    (div) => (div.style.display = "none"),
+                );
+
+                // Show relevant options
+                const selectedMaterial = this.value;
+                if (optionsDivs[selectedMaterial]) {
+                    optionsDivs[selectedMaterial].style.display = "block";
+                }
+            });
+
+            plasticTypeSelect.addEventListener("change", function () {
+                const colorOptions = {
+                    pla: [
+                        "black",
+                        "white",
+                        "gray",
+                        "blue",
+                        "purple",
+                        "orange",
+                        "translucent gold",
+                    ],
+                    petg: ["translucent white"],
+                    tpu: ["green", "translucent red"],
+                    htpla: ["translucent gold"],
+                };
+
+                const colors = colorOptions[this.value] || [];
+                plasticColorSelect.innerHTML =
+                    '<option value="">-- Select Color --</option>';
+                colors.forEach((color) => {
+                    const option = document.createElement("option");
+                    option.value = color;
+                    option.textContent =
+                        color.charAt(0).toUpperCase() + color.slice(1);
+                    plasticColorSelect.appendChild(option);
+                });
+            });
+
+            document
+                .getElementById("jMakeForm")
+                .addEventListener("submit", function (event) {
+                    event.preventDefault();
+
+                    document.getElementById("moreInfo").innerHTML = "";
+
+                    let estimateText = "";
+                    const material = materialSelect.value;
+                    let baseCost = 0;
+                    let laborCost = 0;
+                    let size = 1;
+                    let itemType = "";
+
+                    let leadTime = 0;
+
+                    switch (material) {
+                        case "wood":
+                            baseCost = 5;
+                            laborCost = 5;
+
+                            leadTime = 3;
+
+                            size =
+                                parseInt(
+                                    document.getElementById("woodSize").value,
+                                ) || 1;
+                            itemType =
+                                document.getElementById("woodItemType").value;
+
+                            document.getElementById("moreInfo").innerHTML =
+                                "2D wood items can be CNC cut or laser engraved. 3D wood items are carved by a 5 axis CNC, which takes a lot of setup time and effort. Most of the cost goes to labor if you are doing 3d, else it is material.";
+
+                            break;
+                        case "metal":
+                            baseCost = 5;
+                            laborCost = 20;
+
+                            leadTime = 5;
+
+                            size =
+                                parseInt(
+                                    document.getElementById("metalSize").value,
+                                ) || 1;
+                            itemType =
+                                document.getElementById("metalItemType").value;
+
+                            document.getElementById("moreInfo").innerHTML =
+                                "<b>3D metal items are significantly harder to create as they take a long time and a lot of setup effort. Most of the cost goes to labor. More expensive metals also cost more but calculated here.</b>";
+
+                            break;
+                        case "plastic":
+                            leadTime = 1;
+
+                            baseCost = 0.5;
+                            laborCost = 0.33;
+                            // For simplicity, assume plastic items are 3D printed
+                            itemType = "3d";
+
+                            document.getElementById("moreInfo").innerHTML =
+                                "Plastic items will be 3d printed. If you are looking for no layer lines, look at resin printing (cheapest) or acrylic CNC cut items.";
+
+                            break;
+                        case "resin":
+                            leadTime = 2;
+
+                            baseCost = 1;
+                            laborCost = 2;
+                            // Assume resin items are 3D printed
+                            itemType = "3d";
+
+                            document.getElementById("moreInfo").innerHTML =
+                                "Resin items will be 3d printed. Resin printing is the cheapest way to get a smooth surface finish on plastic items. Please note that the labor cost is higher than normal 3d printing as resin prints need to be washed and cured.";
+
+                            break;
+                        case "wax":
+                            leadTime = 2;
+
+                            baseCost = 3.75;
+                            laborCost = 3;
+                            itemType =
+                                document.getElementById("waxItemType").value;
+
+                            document.getElementById("moreInfo").innerHTML =
+                                "Wax is great for testing designs and candles, but is not very strong. Wax items will be CNC cut. If you are looking for a stronger material, look at resin, plastic, acrylic, or metal.";
+
+                            break;
+                        case "acrylic":
+                            leadTime = 2;
+
+                            baseCost = 8;
+                            laborCost = 3;
+                            itemType =
+                                document.getElementById(
+                                    "acrylicItemType",
+                                ).value;
+
+                            document.getElementById("moreInfo").innerHTML =
+                                "2D acrylic (signs, engraved items, etc.) will be laser cut OR CNC cut. Laser engraved/cut items are the cheapest. 3D acrylic items will be CNC cut on a 5 axis CNC machine. This greatly increases labor costs. Acrylic is a great material for items that need to be strong and clear. If you are looking for a cheaper option, look at plastic or resin.";
+
+                            break;
+                        default:
+                            estimateText = "Please select a material.";
+                    }
+
+                    // Adjust costs based on itemType
+                    if (itemType === "3d") {
+                        baseCost *= 2; // Increase base cost for 3D items
+                        laborCost *= 2.5; // Increase labor cost for 3D items
+
+                        leadTime *= 2;
+                    }
+
+                    var totalCost = (baseCost + laborCost) * (size / 2);
+
+                    if (
+                        itemType === "2d" &&
+                        (material === "acrylic" || material === "wood")
+                    ) {
+                        totalCost = totalCost / (size / 2);
+                    }
+
+                    if (!estimateText) {
+                        estimateText = `Estimated cost for your ${material} item is $${totalCost.toFixed(2)}. The estimated time to make your item is ${leadTime} days.`;
+                    }
+
+                    document.getElementById("estimate").textContent =
+                        estimateText;
+                    document.getElementById("estimateSection").style.display =
+                        "block";
+                });
+        </script>
+    </body>
+</html>
